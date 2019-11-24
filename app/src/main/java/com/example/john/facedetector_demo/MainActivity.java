@@ -1,15 +1,19 @@
 package com.example.john.facedetector_demo;
 
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.john.facedetector_demo.Helper.GraphicOverlay;
+import com.example.john.facedetector_demo.Helper.RectOverlay;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.ml.vision.FirebaseVision;
@@ -41,7 +45,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        // make full-screen app
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
+
 
         // init view
 
@@ -125,7 +136,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void processFaceResult(List<FirebaseVisionFace> firebaseVisionFaces) {
-         
+
+        int count = 0;
+        for(FirebaseVisionFace face:firebaseVisionFaces){
+            Rect bounds = face.getBoundingBox();
+
+            RectOverlay rect = new RectOverlay(graphicOverlay,bounds);
+            graphicOverlay.add(rect);
+            waitingDialog.dismiss();
+            count++;
+        }
+
+        Toast.makeText(this,count+" faces detected",Toast.LENGTH_SHORT).show();
+
+        waitingDialog.dismiss();
+
     }
 
     @Override
